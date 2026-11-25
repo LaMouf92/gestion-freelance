@@ -57,3 +57,26 @@ export function errorMessage(e: unknown) {
   if (e && typeof e === 'object' && 'message' in e) return String((e as { message: unknown }).message)
   return String(e)
 }
+
+/* ---------- Fenêtre modale ---------- */
+export function Modal({ title, onClose, children, footer, wide }: { title: string; onClose: () => void; children: ReactNode; footer?: ReactNode; wide?: boolean }) {
+  return (
+    <div className="modal-backdrop" onMouseDown={onClose}>
+      <div className={`modal card${wide ? ' wide' : ''}`} role="dialog" aria-modal="true" aria-label={title} onMouseDown={(e) => e.stopPropagation()}>
+        <div className="card-head">
+          <h2>{title}</h2>
+          <button className="btn sm ghost" onClick={onClose} aria-label="Fermer">✕</button>
+        </div>
+        <div className="modal-body">{children}</div>
+        {footer && <div className="modal-foot row">{footer}</div>}
+      </div>
+    </div>
+  )
+}
+
+export function Badge({ tone, children }: { tone?: string; children: ReactNode }) {
+  return <span className={`badge ${tone ?? ''}`}>{children}</span>
+}
+
+/** Confirmation simple avant suppression */
+export const confirmDelete = (what: string) => window.confirm(`Supprimer ${what} ? Cette action est définitive.`)
