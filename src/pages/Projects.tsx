@@ -11,7 +11,7 @@ import { ClientModal, EMPTY_CLIENT } from './Clients'
 
 export const EMPTY_PROJECT: Omit<Project, 'id'> = {
   activity_id: null, client_id: null, title: '', status: 'prospect', start_date: null, due_date: null, delivered_date: null,
-  brief: '', deliverables: '', revisions_included: 2, revisions_done: 0, time_spent_hours: 0, links: [], rights_assignment: '', notes: '',
+  brief: '', deliverables: '', revisions_included: 2, revisions_done: 0, time_spent_hours: 0, estimated_amount: null, links: [], rights_assignment: '', notes: '',
 }
 
 export function Projects() {

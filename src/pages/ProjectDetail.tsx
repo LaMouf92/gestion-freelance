@@ -109,6 +109,9 @@ export function ProjectDetail() {
               <Field label="Temps passé (heures)">
                 <input className="input" type="number" min={0} step={0.5} value={p.time_spent_hours} onChange={(e) => set('time_spent_hours', Number(e.target.value))} />
               </Field>
+              <Field label="Montant estimé (€ HT)" hint="Sert à estimer le CA du mois tant qu'aucun devis n'est fait.">
+                <input className="input" type="number" min={0} step={10} value={p.estimated_amount ?? ''} onChange={(e) => set('estimated_amount', e.target.value === '' ? null : Number(e.target.value))} />
+              </Field>
               <Field label="Début"><input className="input" type="date" value={p.start_date ?? ''} onChange={(e) => set('start_date', e.target.value || null)} /></Field>
               <Field label="Date de rendu"><input className="input" type="date" value={p.due_date ?? ''} onChange={(e) => set('due_date', e.target.value || null)} /></Field>
               <Field label="Livré le"><input className="input" type="date" value={p.delivered_date ?? ''} onChange={(e) => set('delivered_date', e.target.value || null)} /></Field>
@@ -142,10 +145,6 @@ export function ProjectDetail() {
 
         <div className="stack" style={{ gap: 16 }}>
           <Milestones projectId={p.id} />
-          <div className="card">
-            <div className="card-head"><h2>Liens</h2></div>
-            <Links links={p.links} onChange={(l) => set('links', l)} />
-          </div>
           <Files projectId={p.id} />
           <div className="card">
             <div className="card-head"><h2>Devis & factures</h2></div>
@@ -208,38 +207,6 @@ function Milestones({ projectId }: { projectId: string }) {
         </div>
       </div>
     </div>
-  )
-}
-
-function Links({ links, onChange }: { links: Project['links']; onChange: (l: Project['links']) => void }) {
-  const [url, setUrl] = useState('')
-  const [label, setLabel] = useState('')
-  const add = () => {
-    if (!url.trim()) return
-    const u = /^https?:\/\//.test(url.trim()) ? url.trim() : `https://${url.trim()}`
-    onChange([...(links ?? []), { label: label.trim() || u.replace(/^https?:\/\//, '').slice(0, 40), url: u }])
-    setUrl('')
-    setLabel('')
-  }
-  return (
-    <>
-      <div className="stack" style={{ gap: 6 }}>
-        {(links ?? []).length === 0 && <p className="muted small">Drive, WeTransfer, Figma, maquettes en ligne…</p>}
-        {(links ?? []).map((l, i) => (
-          <div key={i} className="row" style={{ flexWrap: 'nowrap' }}>
-            <a href={l.url} target="_blank" rel="noreferrer" style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.label}</a>
-            <button className="btn sm ghost" onClick={() => onChange(links.filter((_, j) => j !== i))} aria-label="Retirer"><Icon name="trash" /></button>
-          </div>
-        ))}
-      </div>
-      <div className="stack" style={{ marginTop: 12, gap: 6 }}>
-        <input className="input" placeholder="Adresse du lien" value={url} onChange={(e) => setUrl(e.target.value)} />
-        <div className="row" style={{ flexWrap: 'nowrap' }}>
-          <input className="input" placeholder="Nom (facultatif)" value={label} onChange={(e) => setLabel(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && add()} />
-          <button className="btn" onClick={add} aria-label="Ajouter le lien"><Icon name="plus" /></button>
-        </div>
-      </div>
-    </>
   )
 }
 

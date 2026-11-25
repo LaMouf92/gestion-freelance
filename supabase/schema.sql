@@ -79,11 +79,15 @@ create table if not exists projects (
   revisions_included int default 2,
   revisions_done int default 0,
   time_spent_hours numeric default 0,
+  estimated_amount numeric,             -- montant estimé tant qu'il n'y a pas de devis
   links jsonb default '[]'::jsonb,         -- [{label, url}]
   rights_assignment text default '',
   notes text default '',
   created_at timestamptz default now()
 );
+
+-- (mise à jour d'une base déjà créée)
+alter table projects add column if not exists estimated_amount numeric;
 
 create table if not exists milestones (
   id uuid primary key default gen_random_uuid(),

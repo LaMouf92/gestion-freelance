@@ -12,6 +12,8 @@ import { Timeline } from '../components/planning/Timeline'
 import { MonthCalendar } from '../components/planning/MonthCalendar'
 import type { PlanningProject } from '../components/planning/model'
 import { NewProjectModal } from './Projects'
+import { collectedInMonth, estimatedForMonth, monthKey } from '../lib/finance'
+import { money0, today } from '../lib/format'
 
 type View = 'frise' | 'calendrier'
 const VIEW_KEY = 'planning-view'
@@ -29,6 +31,8 @@ export function Planning() {
   const { rows: projects } = useTable('projects')
   const { rows: milestones } = useTable('milestones')
   const { rows: clients } = useTable('clients', { order: 'name' })
+  const { rows: docs } = useTable('documents')
+  const { rows: payments } = useTable('payments')
   const [view, setView] = useState<View>(readView)
   const [showArchived, setShowArchived] = useState(false)
   const [newAt, setNewAt] = useState<string | null>(null)
@@ -82,7 +86,31 @@ export function Planning() {
       {view === 'frise' ? (
         <Timeline items={items} onOpen={open} />
       ) : (
-        <MonthCalendar items={items} onOpen={open} onCreateAt={(d) => setNewAt(d)} />
+        <MonthCalendar
+          items={items}
+          onOpen={open}
+          onCreateAt={(d) => setNewAt(d)}
+          summary={(m) => {
+            const key = monthKey(m)
+            const est = estimatedForMonth(key, today(), projects, docs, payments)
+            const toDeclare = collectedInMonth(key, payments, docs)
+            const past = key < monthKey(today())
+            return (
+              <>
+                <div className="pill-stat" title="Encaissé + factures à encaisser + devis en cours + montants estimés des projets, rattachés à leur mois de rendu">
+                  <span>CA estimé du mois</span>
+                  <strong>{money0(est.total)}</strong>
+                  {!past && est.pending > 0 && <small>dont {money0(est.pending)} à venir</small>}
+                </div>
+                <div className="pill-stat brand" title="Sommes réellement encaissées ce mois-ci (HT). À déclarer à l'Urssaf avant la fin du mois suivant.">
+                  <span>CA à déclarer</span>
+                  <strong>{money0(toDeclare)}</strong>
+                  <small>encaissé ce mois-ci</small>
+                </div>
+              </>
+            )
+          }}
+        />
       )}
 
       {items.length === 0 && (

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { toIso, today } from '../../lib/format'
 import type { PlanningProject } from './model'
 
@@ -14,7 +14,7 @@ interface CalEvent {
 const WEEKDAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 
 /** Calendrier mensuel : débuts, rendus et échéances de chaque projet. */
-export function MonthCalendar({ items, onOpen, onCreateAt }: { items: PlanningProject[]; onOpen: (id: string) => void; onCreateAt: (iso: string) => void }) {
+export function MonthCalendar({ items, onOpen, onCreateAt, summary }: { items: PlanningProject[]; onOpen: (id: string) => void; onCreateAt: (iso: string) => void; summary?: (monthStart: Date) => ReactNode }) {
   const [cursor, setCursor] = useState(() => {
     const d = new Date()
     return new Date(d.getFullYear(), d.getMonth(), 1, 12)
@@ -57,6 +57,7 @@ export function MonthCalendar({ items, onOpen, onCreateAt }: { items: PlanningPr
           <button className="btn sm" onClick={() => move(1)} aria-label="Mois suivant">›</button>
         </div>
       </div>
+      {summary && <div className="cal-summary">{summary(cursor)}</div>}
       <div className="cal">
         {WEEKDAYS.map((w) => <div key={w} className="cal-head">{w}</div>)}
         {days.map((d) => {

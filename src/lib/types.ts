@@ -68,6 +68,7 @@ export interface Project {
   revisions_included: number
   revisions_done: number
   time_spent_hours: number
+  estimated_amount: number | null
   links: { label: string; url: string }[]
   rights_assignment: string
   notes: string
